@@ -10,9 +10,7 @@ for _, Child: ModuleScript in pairs(ServerStorage.Source:GetDescendants()) do
 
   local IsComponent = Child:IsDescendantOf(ServerStorage.Source.Components) and Child.Name:match("Component$")
   local IsService = Child:IsDescendantOf(ServerStorage.Source.Services) and Child.Name:match("Service$")
-  print(IsService, IsComponent)
   if IsModule and (IsComponent or IsService) then
-    print(Child)
     require(Child)
   end
 end

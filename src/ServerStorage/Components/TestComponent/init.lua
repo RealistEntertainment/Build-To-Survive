@@ -1,10 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Component = require(ReplicatedStorage.Packages.Components)
-local Janitor = require(ReplicatedStorage.Packages.Janitor)
-local Signal = require(ReplicatedStorage.Packages.Signal)
+--local Janitor = require(ReplicatedStorage.Packages.Janitor)
+--local Signal = require(ReplicatedStorage.Packages.Signal)
 
-local TestExtention = require(script.Parent.TestExtention)
+local TestExtention = require(script.TestExtension)
 
 local TestComponent = Component.new{
     Tag = "Test",
