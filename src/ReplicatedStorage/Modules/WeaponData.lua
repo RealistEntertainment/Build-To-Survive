@@ -71,7 +71,7 @@ WeaponData.Swords = {
         AttackDelay = .85,
         AttackRange = 7,
         CategorySort = {
-            Swords = 00016
+            Swords = 00017
         },
         Cost = 97500
     }
