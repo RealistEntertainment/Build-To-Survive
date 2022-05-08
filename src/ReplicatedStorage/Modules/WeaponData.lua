@@ -4,7 +4,7 @@ WeaponData.CategoryList = {"Swords"}
 
 WeaponData.Swords = {
     ["Wooden Sword"] = {
-        Damage = 1,
+        Damage = 3,
         AttackDelay = 1,
         AttackRange = 6.5,
         CategorySort = {
@@ -13,7 +13,7 @@ WeaponData.Swords = {
         Cost = 0
     },
     ["Stone Sword"] = {
-        Damage = 2,
+        Damage = 4,
         AttackDelay = .85,
         AttackRange = 7,
         CategorySort = {
