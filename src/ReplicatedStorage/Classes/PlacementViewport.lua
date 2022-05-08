@@ -20,10 +20,8 @@ function PlacementViewport.new(Viewport : ViewportFrame, ViewportObject : Model)
     -- Add InputBegan event to janitor
     self.janitor:Add(
         self.Viewport.InputBegan:Connect(function(inputObject)
-            if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
+            if inputObject.UserInputType == Enum.UserInputType.MouseMovement or inputObject.UserInputType == Enum.UserInputType.Touch then
                 self:Hover()
-            elseif inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-                self:Select()
             end
         end)
     )
@@ -32,6 +30,8 @@ function PlacementViewport.new(Viewport : ViewportFrame, ViewportObject : Model)
         self.Viewport.InputEnded:Connect(function(inputObject)
             if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
                 self:UnHover()
+            elseif inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
+                self:Select()
             end
         end)
     )
