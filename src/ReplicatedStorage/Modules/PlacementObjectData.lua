@@ -15,7 +15,7 @@ PlacmentObjectData.Blocks = {
         CategorySort = {
             ["Blocks"] = 0002,
         },
-        Health = 5,
+        Health = 8,
         Cost = 1,
     },
 
@@ -24,56 +24,56 @@ PlacmentObjectData.Blocks = {
             ["Blocks"] = 0003,
         },
         Health = 15,
-        Cost = 5,
+        Cost = 2,
     },
     ["Stone"] = {
         CategorySort = {
             ["Blocks"] = 0004,
         },
         Health = 45,
-        Cost = 15,
+        Cost = 5,
     },
     ["Copper"] = {
         CategorySort = {
             ["Blocks"] = 0005,
         },
         Health = 75,
-        Cost = 45,
+        Cost = 10,
     },
     ["Iron"] = {
         CategorySort = {
             ["Blocks"] = 0006,
         },
         Health = 125,
-        Cost = 125,
+        Cost = 20,
     },
     ["Gold"] = {
         CategorySort = {
             ["Blocks"] = 0007,
         },
         Health = 175,
-        Cost = 750,
+        Cost = 40,
     },
     ["Emerald"] = {
         CategorySort = {
             ["Blocks"] = 0008,
         },
         Health = 225,
-        Cost = 2500,
+        Cost = 75,
     },
     ["Diamond"] = {
         CategorySort = {
             ["Blocks"] = 0009,
         },
-        Health = 275,
-        Cost = 7500,
+        Health = 300,
+        Cost = 100,
     },
     ["Obsidian"] = {
         CategorySort = {
             ["Blocks"] = 0091,
         },
-        Health = 325,
-        Cost = 27000,
+        Health = 500,
+        Cost = 250,
     },
 }
 
@@ -85,7 +85,7 @@ PlacmentObjectData.Turrets = {
         Damage = 5,
         FireRate = 3, -- seconds
         Health = 25,
-        Cost = 500,
+        Cost = 150,
     },
 }
 
@@ -95,15 +95,15 @@ PlacmentObjectData.Barricades = {
             ["Barricades"] = 0001,
         },
         Health = 125,
-        Cost = 100,
+        Cost = 25,
     },
     ["Metal Barricade"] = {
         CategorySort = {
             ["Barricades"] = 00011,
         },
 
-        Health = 25,
-        Cost = 500,
+        Health = 250,
+        Cost = 75,
     },
 }
 
