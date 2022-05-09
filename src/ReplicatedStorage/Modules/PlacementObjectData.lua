@@ -1,6 +1,6 @@
 local PlacmentObjectData = {}
 
-PlacmentObjectData.CategoryList = {"Blocks", "Turrets"}
+PlacmentObjectData.CategoryList = {"Blocks", "Turrets", "Barricades"}
 
 PlacmentObjectData.Blocks = {
     ["Leaves"] = {
@@ -84,6 +84,24 @@ PlacmentObjectData.Turrets = {
         },
         Damage = 5,
         FireRate = 3, -- seconds
+        Health = 25,
+        Cost = 500,
+    },
+}
+
+PlacmentObjectData.Barricades = {
+    ["Wooden Barricade"] = {
+        CategorySort = {
+            ["Barricades"] = 0001,
+        },
+        Health = 125,
+        Cost = 100,
+    },
+    ["Metal Barricade"] = {
+        CategorySort = {
+            ["Barricades"] = 00011,
+        },
+
         Health = 25,
         Cost = 500,
     },

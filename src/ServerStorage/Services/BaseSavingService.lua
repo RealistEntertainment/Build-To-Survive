@@ -13,6 +13,7 @@ local PlayerService
 
 local Classes = script.Parent.Parent.Classes
 local TurretClass = require(Classes.TurretClass)
+local BarricadeClass = require(Classes.BarricadeClass)
 
 local BaseSavingService = Knit.CreateService{
     Name = "BaseSavingService",
@@ -63,7 +64,7 @@ function BaseSavingService:AddItem(player: Player, Item : Model, Category,  Base
                 Health.Name = "Health"
                 Health.Value = PlacementObjectData[Category][Item.Name].Health or 1
 
-                local ItemID = Instance.new("NumberValue")
+                local ItemID = Instance.new("StringValue")
                 ItemID.Parent = Item
                 ItemID.Name = "ID"
                 ItemID.Value = ID
@@ -91,16 +92,20 @@ end
 
 function BaseSavingService:DamageItem(player: Player, Item : Model, Amount : number)
     if player and Item and tonumber(Amount) then
+        print(player, Item, Amount)
         local Profile = self.CachedProfiles[player]
         if Profile then
             local ID = Item:FindFirstChild("ID")
-            if ID then
+            local Health = Item:FindFirstChild("Health")
+            if ID and Health then
+                print("Has ID and Health")
                 local ItemData = Profile.Data.Base[ID.Value]
                 if ItemData then
+                    print("Item data")
                     if ItemData.Health - Amount > 0 then
-                        Item.Health.Value -= Amount
-                        Profile.Data.Base[ID.Value].Health = Item.Health.Value
-                        else
+                        Health.Value -= Amount
+                        Profile.Data.Base[ID.Value].Health = Health.Value
+                    else
                         Profile.Data.Base[ID.Value] = nil
                         Debris:AddItem(Item, 0)
                     end
@@ -142,12 +147,14 @@ function BaseSavingService:LoadPlayerBase(player : Player)
             Health.Name = "Health"
             Health.Value = ItemData.Health or PlacementObjectData[ItemData.Category][ItemData.Name].Health
 
-            local ItemID = Instance.new("NumberValue")
+            local ItemID = Instance.new("StringValue")
             ItemID.Parent = Item
             ItemID.Name = "ID"
             ItemID.Value = ID
             if ItemData.Category == "Turrets" then
                 TurretClass.new(Item, PlayerService.Players[player.UserId])
+            elseif ItemData.Category == "Barricades" then
+                BarricadeClass.new(Item, PlayerService.Players[player.UserId])
             end
         end
     end

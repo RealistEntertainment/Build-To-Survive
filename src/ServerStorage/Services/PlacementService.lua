@@ -9,6 +9,7 @@ local PlacementObjectData = require(ReplicatedModules.PlacementObjectData)
 
 local Classes = script.Parent.Parent.Classes
 local TurretClass = require(Classes.TurretClass)
+local BarricadeClass = require(Classes.BarricadeClass)
 
 local Assets
 
@@ -31,20 +32,15 @@ function PlacementService:PlaceObject(player : Player, ObjectName, ObjectCFrame,
             local isCashRemoved = PlayerDataService:RemoveMoney(player, ObjectData.Cost)
             print(isCashRemoved)
             if isCashRemoved then
+                --// make sure objects is inside the player bases
+                Object = Object:Clone()
+                Object:PivotTo(ObjectCFrame)
+                Object.Parent = PlayerService.Players[player.UserId].Base.Objects
                 if Category == "Turrets" then
-                     --// make sure objects is inside the player bases
-                     Object = Object:Clone()
-                     Object:PivotTo(ObjectCFrame)
-                     Object.Parent = PlayerService.Players[player.UserId].Base.Objects
-                     TurretClass.new(Object, PlayerService.Players[player.UserId])
-                else
-                    --// make sure objects is inside the player bases
-                    Object = Object:Clone()
-                    Object:PivotTo(ObjectCFrame)
-                    Object.Parent = PlayerService.Players[player.UserId].Base.Objects
+                    TurretClass.new(Object, PlayerService.Players[player.UserId])
+                elseif Category == "Barricades" then
+                    BarricadeClass.new(Object, PlayerService.Players[player.UserId])
                 end
-                
-
                 BaseSavingService:AddItem(player, Object, Category, PlayerService.Players[player.UserId].Base)
             end
 

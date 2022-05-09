@@ -25,7 +25,9 @@ function TurretClass.new(Turret : Model, PlayerClass)
     self.PlayerDataService = Knit.GetService("PlayerDataService")
 
     self._janitor = Janitor.new()
-    self._janitor:Add(self.Turret)
+    self._janitor:Add(self.Turret.Destroying:Connect(function()
+        self:Destroy()
+    end))
     self:StartBrain()
     return self
 end
@@ -36,14 +38,15 @@ function TurretClass:PlayAttack(TargetPosition)
     if GunBarrel and Base then
         local rotation : CFrame = CFrame.new(GunBarrel.Position, TargetPosition)
         local RelatativeCenterCFrame = Base.CFrame:ToObjectSpace(GunBarrel.CFrame)
-        --// offset the vector to be the look vector 
+        
+        --// Get rotation offset
         local GoalRotation : CFrame = (GunBarrel.CFrame * CFrame.Angles(0, math.pi/2, 0)):Inverse() * rotation 
         local X, Y, Z = GoalRotation:ToEulerAnglesXYZ()
+       
         GunBarrel:PivotTo(
-            Base.CFrame
-            * CFrame.fromEulerAnglesXYZ(0, Y, 0)
-            * RelatativeCenterCFrame
-
+            Base.CFrame --// position barrel to Base
+            * CFrame.fromEulerAnglesXYZ(0, Y, 0) --// rotate the barrel to the target
+            * RelatativeCenterCFrame --// apply offset from base to barrel
         )
     end
 end
@@ -67,18 +70,18 @@ function TurretClass:StartBrain()
     self.BrainActive = true
     task.spawn(function()
         while self.BrainActive do
-            task.wait(self.TurretData.FireRate)
+            task.wait()
             local ClosestNPC = self:GetClosetsNPC()
             if ClosestNPC then
                 local raycastpara = RaycastParams.new()
                 local rayResult = workspace:Raycast(self.Turret.WorldPivot.Position, ClosestNPC.PrimaryPart.Position - self.Turret.WorldPivot.Position, raycastpara)
                 if rayResult then
                     if rayResult.Instance:IsDescendantOf(ClosestNPC) then
-                        print(rayResult.Instance)
+              --          print(rayResult.Instance)
                         local Humanoid : Humanoid = ClosestNPC:FindFirstChild("Humanoid")
                         if Humanoid then
-                            Humanoid:TakeDamage(self.TurretData.Damage)
-                            self.PlayerDataService:AddMoney(self.PlayerClass.Player, math.floor(self.TurretData.Damage))
+                           -- Humanoid:TakeDamage(self.TurretData.Damage)
+                            --self.PlayerDataService:AddMoney(self.PlayerClass.Player, math.floor(self.TurretData.Damage))
                             self:PlayAttack(ClosestNPC.PrimaryPart.Position)
                         end
                     end

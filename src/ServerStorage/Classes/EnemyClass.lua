@@ -28,7 +28,11 @@ function EnemyClass.new(Npc : Model, TargetPlayer : Player)
 
     self._janitor = Janitor.new()
     self._janitor:Add(self.Npc)
-
+    self._janitor:Add(
+        self.Humanoid.Died:Connect(function()
+        self:Destroy()
+    end)
+    )
     return self
 end
 
