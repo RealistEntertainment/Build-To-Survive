@@ -35,11 +35,11 @@ function BaseSavingService:GetID(player, base)
     local Profile = self.CachedProfiles[player]
     local Objects = base.Objects:GetChildren()
     if not Profile.Data.Base[#Objects+1] then --// if object count + 1 is open then return ID
-        return #Objects+1
+        return tostring(#Objects+1)
     else
         for i = 1, #Objects do
             if not Profile.Data[i] then --// if data is open for this ID the return it
-                return i
+                return tostring(i)
             end
         end
     end
@@ -98,7 +98,7 @@ function BaseSavingService:DamageItem(player: Player, Item : Model, Amount : num
             local ID = Item:FindFirstChild("ID")
             local Health = Item:FindFirstChild("Health")
             if ID and Health then
-                print("Has ID and Health")
+                print("Has ID and Health",ID , ID.Value, Profile.Data.Base)
                 local ItemData = Profile.Data.Base[ID.Value]
                 if ItemData then
                     print("Item data")
