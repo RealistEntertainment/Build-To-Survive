@@ -92,16 +92,13 @@ end
 
 function BaseSavingService:DamageItem(player: Player, Item : Model, Amount : number)
     if player and Item and tonumber(Amount) then
-        print(player, Item, Amount)
         local Profile = self.CachedProfiles[player]
         if Profile then
             local ID = Item:FindFirstChild("ID")
             local Health = Item:FindFirstChild("Health")
             if ID and Health then
-                print("Has ID and Health",ID , ID.Value, Profile.Data.Base)
                 local ItemData = Profile.Data.Base[ID.Value]
                 if ItemData then
-                    print("Item data")
                     if ItemData.Health - Amount > 0 then
                         Health.Value -= Amount
                         Profile.Data.Base[ID.Value].Health = Health.Value

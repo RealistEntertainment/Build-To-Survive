@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Janitor = require(ReplicatedStorage.Packages.Janitor)
 local Signal = require(ReplicatedStorage.Packages.Signal)
+local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local PlayerClass = {}
 PlayerClass.__index = PlayerClass
@@ -21,6 +22,7 @@ function PlayerClass.new(player: Player)
     self.ActiveDebounces = {}
     self.LastAttack = os.time()
 
+    self.GamepassService = Knit.GetService("GamepassService")
 
     self.SpawnPosition = Vector3.new(0,0,0)
     --// character added event
@@ -34,6 +36,11 @@ function PlayerClass.new(player: Player)
             self.CharacterAdded:Fire()
             --// character died event
             local Hum : Humanoid = Character:WaitForChild("Humanoid")
+            if self.GamepassService:UserOwnsPass(player, 44187143) then
+                if Hum then
+                    Hum.WalkSpeed = 32
+                end
+            end
             Hum.Died:Connect(function()
                 self.CharacterDied:Fire()
                 self.Player:LoadCharacter()

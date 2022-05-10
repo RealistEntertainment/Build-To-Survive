@@ -79,7 +79,6 @@ function WeaponService:EquipWeapon(player : Player, oldWeapon : Tool, newWeapon 
 end
 
 function WeaponService.Client:Damage(player, Target)
-    print(player, Target)
     if Target and player then
       return self.Server:Damage(player, Target)  
     end
@@ -87,12 +86,11 @@ end
 
 function WeaponService:Damage(player : Player, target : BasePart)
     --//Get weapon data and current weapon and check distance of target from the character hrp
-    print(player, target)
     local CachedPlayer = self.PlayerDataService.CachedProfiles[player]
     local PlayerClass = self.PlayerService.Players[player.UserId]
-    print(PlayerClass, CachedPlayer)
     if CachedPlayer and player.Character
         and player:HasAppearanceLoaded() then
+            print(CachedPlayer)
         local CurrentWeapon = CachedPlayer.Data.CurrentWeapon
         local CurrentWeaponCategory = CachedPlayer.Data.Weapons[CurrentWeapon].Category
         local CurrentWeaponData = self.WeaponData[CurrentWeaponCategory][CurrentWeapon]

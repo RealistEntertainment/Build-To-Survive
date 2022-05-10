@@ -23,10 +23,11 @@ local DataStoreSettings = {
                 Category = "Swords"
             }
         },
-        CurrentWeapon = "Wooden Sword"
+        CurrentWeapon = "Wooden Sword",
+        GamepassData = {}
     },
 }
-local ProfileStore = ProfileService.GetProfileStore("PlayerData", DataStoreSettings.ProfileStoreTemplate)
+local ProfileStore = ProfileService.GetProfileStore("PlayerDataV1", DataStoreSettings.ProfileStoreTemplate)
 if RunService:IsStudio() == true then
   --  ProfileStore = ProfileStore.Mock
 end
@@ -94,7 +95,12 @@ end
 function PlayerDataService:AddMoney(player: Player, amount : number)
     local Profile = self.CachedProfiles[player]
     if Profile and tonumber(amount) then
-        Profile.Data.Cash += amount
+        local DoubleMoneyPass = self.GamepassService:UserOwnsPass(player, 44188735)
+        if DoubleMoneyPass then
+            Profile.Data.Cash += (amount * 2)
+        else
+            Profile.Data.Cash += amount
+        end
         self.Client.CashUpdate:Fire(player, Profile.Data.Cash)
     end
 end
@@ -127,6 +133,7 @@ function PlayerDataService:PlayerAdded(player : Player)
 end
 
 function PlayerDataService:KnitInit()
+    self.GamepassService = Knit.GetService("GamepassService")
     self.CachedProfiles = {}
 end
 

@@ -27,6 +27,7 @@ function PlacementController:PromptCancelFrame(ObjectTitle)
     self.CancelFrame.Visible = true
     self.BuildJanitor:Add(self.CancelButton.Activated:Connect(function()
         PlacementController:SetDefault()
+        self.WeaponController:Equip()
     end))
 end
 
@@ -48,7 +49,12 @@ function PlacementController:BuildMode(ObjectName : string)
         self.SelectedObject = Object:Clone()
         self.SelectedObject.Parent = workspace
 
-
+        print(self.SelectionBox)
+        if self.SelectionBox.Parent == nil then 
+            self.SelectionBox = Util.CreateSelectionBox(Color3.fromRGB(0,255,0))
+        end
+        self.SelectionBox.Color3 = Color3.fromRGB(0,255,0)
+        self.SelectionBox.Adornee = self.SelectedObject
          --// check for players base
          if self.Base  == nil then 
             PlayerService.GetPlayerBase():andThen(function(base)
@@ -81,7 +87,7 @@ function PlacementController:BuildMode(ObjectName : string)
                     local minZ, maxZ = (BaseCFrame + Vector3.new(0,0,BaseSize.Z/2)).Position.Z, 
                                        (BaseCFrame - Vector3.new(0,0,BaseSize.Z/2)).Position.Z
 
-                    local minY, maxY = BaseCFrame.Position.Y,
+                    local minY, maxY = BaseCFrame.Position.Y + BaseSize.Y/2,
                                        BaseCFrame.Position.Y + ObjectExtents.Y/2 + 90
 
                     --// make sure the target is an object on the base or the baseplate
@@ -150,7 +156,6 @@ function PlacementController:BuildMode(ObjectName : string)
                         roundToTheNearest(ClampedPosition.Y, 3) + ObjectExtents.Y/2,
                         roundToTheNearest(ClampedPosition.Z, 3)
                     )
-                    print(GridPosition, ClampedPosition)
 
                    -- if Target == self.Base.Baseplate then
                       --  GridPosition +=  Vector3.new(0,BaseSize.Y/2,0)
@@ -162,14 +167,11 @@ function PlacementController:BuildMode(ObjectName : string)
 
                     --// Apply relative gridposition to baseplate position
                     self.SelectedObject:PivotTo(
-                             CFrame.new(GridPosition)
+                        CFrame.new(GridPosition)
                     )
-                    
                 end
             end)
         )
-
-        task.wait(1)
         self.SelectedObjectJanitor:Add(
             UserInputService.InputBegan:Connect(function(Input : InputObject, GPE)
                 print(GPE)
@@ -361,6 +363,9 @@ function PlacementController:DeleteMode()
     PlacementController:PromptCancelFrame("Delete Mode")
     
     self.State = "DeleteMode"
+    if self.SelectionBox.Parent == nil  then 
+        self.SelectionBox = Util.CreateSelectionBox(Color3.fromRGB(255,0,0)) 
+    end
     self.SelectionBox.Color3 = Color3.fromRGB(255,0,0)
 
     --// check for players base
@@ -411,7 +416,9 @@ function PlacementController:SetDefault()
     self.Category_Janitor:Cleanup()
     self.BuildJanitor:Cleanup()
     self.SelectedObject = nil
-    self.SelectionBox.Adornee = nil
+    if self.SelectionBox then
+       self.SelectionBox.Adornee = nil 
+    end
 end
 
 function PlacementController:KnitStart()
@@ -447,8 +454,8 @@ function PlacementController:KnitStart()
     self.Camera.CFrame = CFrame.new()
 
     --// Selectionbox
-    self.SelectionBox = Instance.new("SelectionBox")
-    self.SelectionBox.Parent = self.Player.PlayerGui
+    self.SelectionBox = Util.CreateSelectionBox(Color3.fromRGB(255,0,0))
+
     self.Base = nil
     self.State = "Default"
 
@@ -482,7 +489,7 @@ function PlacementController:KnitStart()
 
     WeaponButton.Activated:Connect(function()
         self:LoadCategories(self.WeaponData.CategoryList, false)
-         self.WeaponController:Unequip()
+        self.WeaponController:Unequip()
     end)
 
     BuildButton.Activated:Connect(function(inputObject, clickCount)

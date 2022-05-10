@@ -1,4 +1,7 @@
 local ServerScriptService = game:GetService("ServerScriptService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -68,26 +71,37 @@ end
 
 function TurretClass:StartBrain()
     self.BrainActive = true
-    task.spawn(function()
-        while self.BrainActive do
-            task.wait()
-            local ClosestNPC = self:GetClosetsNPC()
-            if ClosestNPC then
+    self.CanAttack = true
+    self.Rendering = false
+    self.Brain = RunService.Stepped:Connect(function()
+        if not self.BrainActive then
+             self.Brain:Disconnect()
+             return
+        end
+        local ClosestNPC = self:GetClosetsNPC()
+        if ClosestNPC and not self.Rendering then
+            self.Rendering = true
+            self:PlayAttack(ClosestNPC.PrimaryPart.Position)
+            if self.CanAttack then
                 local raycastpara = RaycastParams.new()
                 local rayResult = workspace:Raycast(self.Turret.WorldPivot.Position, ClosestNPC.PrimaryPart.Position - self.Turret.WorldPivot.Position, raycastpara)
                 if rayResult then
                     if rayResult.Instance:IsDescendantOf(ClosestNPC) then
-              --          print(rayResult.Instance)
+            --          print(rayResult.Instance)
                         local Humanoid : Humanoid = ClosestNPC:FindFirstChild("Humanoid")
                         if Humanoid then
-                           -- Humanoid:TakeDamage(self.TurretData.Damage)
-                            --self.PlayerDataService:AddMoney(self.PlayerClass.Player, math.floor(self.TurretData.Damage))
-                            self:PlayAttack(ClosestNPC.PrimaryPart.Position)
+                            self.CanAttack = false
+                            Humanoid:TakeDamage(self.TurretData.Damage)
+                            self.PlayerDataService:AddMoney(self.PlayerClass.Player, math.floor(self.TurretData.Damage))
+                            task.delay(self.TurretData.FireRate ,function() 
+                                self.CanAttack = true
+                            end)
                         end
                     end
                 end
-            end        
-        end
+            end
+            self.Rendering = false
+        end    
     end)
 end
 

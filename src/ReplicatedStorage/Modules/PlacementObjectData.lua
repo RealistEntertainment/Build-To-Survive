@@ -82,8 +82,8 @@ PlacmentObjectData.Turrets = {
         CategorySort = {
             ["Turrets"] = 0001,
         },
-        Damage = 5,
-        FireRate = 3, -- seconds
+        Damage = 3,
+        FireRate = 1, -- seconds
         Health = 25,
         Cost = 150,
     },

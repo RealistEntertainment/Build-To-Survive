@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local config = require(script.Parent.config)
 
 local util = {}
@@ -48,6 +49,13 @@ function util.CategoryGridLayout(Grid : UIGridLayout)
             Grid[Property] = Value
         end
     end
+end
+
+function util.CreateSelectionBox(color)
+    local selectionBox = Instance.new("SelectionBox")
+    selectionBox.Color3 = color
+    selectionBox.Parent = workspace
+    return selectionBox
 end
 
 return util
