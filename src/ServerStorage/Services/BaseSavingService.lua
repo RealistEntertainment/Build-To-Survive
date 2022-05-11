@@ -7,6 +7,9 @@ local ServerStorage = game:GetService("ServerStorage")
 local SharedModules = ReplicatedStorage.Source.Modules
 local PlacementObjectData = require(SharedModules.PlacementObjectData)
 
+local Modules = script.Parent.Parent.Modules
+local ProximityPromptModule = require(Modules.ProximityPrompt)
+
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local ProfileService = require(ServerStorage.Source.Services.ProfileService)
 local PlayerService
@@ -14,6 +17,8 @@ local PlayerService
 local Classes = script.Parent.Parent.Classes
 local TurretClass = require(Classes.TurretClass)
 local BarricadeClass = require(Classes.BarricadeClass)
+local DoorClass = require(Classes.DoorClass)
+local HatchClass = require(Classes.HatchClass)
 
 local BaseSavingService = Knit.CreateService{
     Name = "BaseSavingService",
@@ -108,7 +113,9 @@ function BaseSavingService:DamageItem(player: Player, Item : Model, Amount : num
                     end
                 end
             else
-                assert(false, "Failed to find object ID")
+                task.spawn(function()
+                  assert(false, "Failed to find object ID")  
+                end)
             end
         end
     end
@@ -148,10 +155,23 @@ function BaseSavingService:LoadPlayerBase(player : Player)
             ItemID.Parent = Item
             ItemID.Name = "ID"
             ItemID.Value = ID
+
+            local ProximityPrompt = ProximityPromptModule.ObjectPrompt()
+            ProximityPrompt.Parent = Item
+
             if ItemData.Category == "Turrets" then
                 TurretClass.new(Item, PlayerService.Players[player.UserId])
             elseif ItemData.Category == "Barricades" then
                 BarricadeClass.new(Item, PlayerService.Players[player.UserId])
+            elseif ItemData.Category == "Doors" then
+                local isDoorClass = string.find(ItemData.Name, "Door")
+                ProximityPrompt.Name = "DoorPrompt"
+                ProximityPrompt.ClickablePrompt = true
+                if isDoorClass then
+                    DoorClass.new(Item, PlayerService.Players[player.UserId])
+                else
+                    HatchClass.new(Item, PlayerService.Players[player.UserId])
+                end
             end
         end
     end

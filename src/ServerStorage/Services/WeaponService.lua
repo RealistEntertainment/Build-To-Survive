@@ -3,6 +3,10 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
+--// modules
+local Modules = script.Parent.Parent.Modules
+local MobsModule = require(Modules.Mobs)
+
 local WeaponService = Knit.CreateService{
     Name = "WeaponService",
     Client = {}
@@ -99,9 +103,16 @@ function WeaponService:Damage(player : Player, target : BasePart)
             if (target.Position - player.Character.HumanoidRootPart.Position).Magnitude <= (CurrentWeaponData.AttackRange * 1.2) then
                 local TargetHumanoid : Humanoid = target.Parent:FindFirstChild("Humanoid")
                 if TargetHumanoid then
-                   PlayerClass.LastAttack = os.time()  
-                   TargetHumanoid:TakeDamage(CurrentWeaponData.Damage)
-                   self.PlayerDataService:AddMoney(player, math.floor(CurrentWeaponData.Damage))
+                    PlayerClass.LastAttack = os.time()  
+                    
+                    --// check if you are going to kill it
+                    if (TargetHumanoid.Health - CurrentWeaponData.Damage <= 0)  and MobsModule[target.Name]
+                        and MobsModule[target.Name].DeathReward then
+                        self.PlayerDataService:AddMoney(player, MobsModule[target.Name].DeathReward)
+                    end
+
+                    TargetHumanoid:TakeDamage(CurrentWeaponData.Damage)
+                    self.PlayerDataService:AddMoney(player, math.floor(CurrentWeaponData.Damage))
                 end
             end
         end

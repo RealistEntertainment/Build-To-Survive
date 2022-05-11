@@ -95,10 +95,10 @@ function EventClass:CleanUp()
     self.RoundService.Client.Feedback:FireAll(false)
 
     --// remove npc
-    if self.Npc then
+    if self.Npc ~= nil then
         print(self.Npc)
         for idx, NpcClass in pairs(self.Npc) do
-            self.Npc[idx]:Destroy()
+            NpcClass:Destroy()
         end
         self.Npc = {}
     end

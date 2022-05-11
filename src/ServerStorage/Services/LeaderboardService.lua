@@ -51,9 +51,11 @@ local function convertToTimeStamp(seconds)
 end
 
 function LeaderboardService:UpdatePlayerTime(LastTime, key)
-	self.TimePlayedDataStore:UpdateAsync(key, function(oldValue)
-		local newValue = tonumber(oldValue) or 0
-		return newValue + math.floor(os.time() - LastTime)
+	pcall(function() 
+		self.TimePlayedDataStore:UpdateAsync(key, function(oldValue)
+			local newValue = tonumber(oldValue) or 0
+			return newValue + math.floor(os.time() - LastTime)
+		end)
 	end)
 end
 
@@ -91,8 +93,13 @@ function LeaderboardService:KnitStart()
 		--// Update player times
 		for player, Data in pairs(self.PlayerTimes) do
 			task.wait(15)
-			self:UpdatePlayerTime(Data[2], Data[1])
-			self.PlayerTimes[player][2] = os.time() -- reset last time 
+			pcall(function()
+				
+			end)
+			if self.PlayerTimes[player]  then
+				self:UpdatePlayerTime(Data[2], Data[1])
+				Data[2] = os.time() -- reset last time 
+			end
 		end
 
 		--// display on boards

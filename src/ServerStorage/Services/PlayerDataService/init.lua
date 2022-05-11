@@ -1,12 +1,16 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local MarketplaceService = game:GetService("MarketplaceService")
 local ServerStorage = game:GetService("ServerStorage")
 
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local ProfileService = require(ServerStorage.Source.Services.ProfileService)
 local PlayerService
+
+local config = require(script.config)
+
 local PlayerDataService = Knit.CreateService{
     Name = "PlayerDataService",
     Client = {
@@ -15,18 +19,8 @@ local PlayerDataService = Knit.CreateService{
     }
 }
 
-local DataStoreSettings = {
-    ProfileStoreTemplate = {
-        Cash = 100,
-        Weapons = {
-            ["Wooden Sword"] = {
-                Category = "Swords"
-            }
-        },
-        CurrentWeapon = "Wooden Sword",
-        GamepassData = {}
-    },
-}
+local DataStoreSettings = config.DataStoreSettings
+
 local ProfileStore = ProfileService.GetProfileStore("PlayerDataV1", DataStoreSettings.ProfileStoreTemplate)
 if RunService:IsStudio() == true then
   --  ProfileStore = ProfileStore.Mock
@@ -155,6 +149,9 @@ function PlayerDataService:KnitStart()
             Profile:Release()
         end
     end)
+
+    self.util = require(script.util)
+    MarketplaceService.ProcessReceipt = self.util.ProcessReceipt 
 end
  
 

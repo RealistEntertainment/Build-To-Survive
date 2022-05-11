@@ -10,6 +10,9 @@ local Janitor = require(ReplicatedStorage.Packages.Janitor)
 local SharedModules = ReplicatedStorage.Source.Modules
 local PlacementObjectData = require(SharedModules.PlacementObjectData)
 
+--// modules
+local Modules = script.Parent.Parent.Modules
+local MobsModule = require(Modules.Mobs)
 
 local TurretClass = {}
 TurretClass.__index = TurretClass
@@ -93,6 +96,13 @@ function TurretClass:StartBrain()
                             self.CanAttack = false
                             Humanoid:TakeDamage(self.TurretData.Damage)
                             self.PlayerDataService:AddMoney(self.PlayerClass.Player, math.floor(self.TurretData.Damage))
+
+                            --// check if we killed it
+                            if (Humanoid.Health - self.TurretData.Damage <= 0)  and MobsModule[ClosestNPC.Name]
+                                and MobsModule[ClosestNPC.Name].DeathReward then
+                                self.PlayerDataService:AddMoney(self.PlayerClass.Player, MobsModule[ClosestNPC.Name].DeathReward)
+                            end
+
                             task.delay(self.TurretData.FireRate ,function() 
                                 self.CanAttack = true
                             end)

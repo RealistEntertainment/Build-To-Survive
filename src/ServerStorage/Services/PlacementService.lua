@@ -10,6 +10,11 @@ local PlacementObjectData = require(ReplicatedModules.PlacementObjectData)
 local Classes = script.Parent.Parent.Classes
 local TurretClass = require(Classes.TurretClass)
 local BarricadeClass = require(Classes.BarricadeClass)
+local DoorClass = require(Classes.DoorClass)
+local HatchClass = require(Classes.HatchClass)
+
+local Modules = script.Parent.Parent.Modules
+local ProximityPromptModule = require(Modules.ProximityPrompt)
 
 local Assets
 
@@ -28,6 +33,25 @@ function PlacementService:PlaceObject(player : Player, ObjectName, ObjectCFrame,
         local Object = Assets.PlacementObjects:FindFirstChild(ObjectName)
         local ObjectData = PlacementObjectData[Category][ObjectName]
         if Object and ObjectData then
+            --// make sure the object isn't intersecting others
+            local OverLapPara = OverlapParams.new()
+            OverLapPara.FilterType = Enum.RaycastFilterType.Whitelist
+            OverLapPara.FilterDescendantsInstances = {PlayerService.Players[player.UserId].Base.Objects}
+
+            local HitParts = workspace:GetPartBoundsInBox(
+                ObjectCFrame,
+                Vector3.new(Object.PrimaryPart.Size.X/2, Object.PrimaryPart.Size.Y/2, Object.PrimaryPart.Size.Z/2),
+                OverLapPara
+            )
+
+            for _, Part in ipairs(HitParts) do
+                local Model = Part:FindFirstAncestorOfClass("Model")
+                if Model
+                    and Model ~= self.SelectedObject then
+                        return
+                end
+            end
+
             --// Make sure player can purchase item
             local isCashRemoved = PlayerDataService:RemoveMoney(player, ObjectData.Cost)
             print(isCashRemoved)
@@ -36,10 +60,22 @@ function PlacementService:PlaceObject(player : Player, ObjectName, ObjectCFrame,
                 Object = Object:Clone()
                 Object:PivotTo(ObjectCFrame)
                 Object.Parent = PlayerService.Players[player.UserId].Base.Objects
+
+                local ProximityPrompt = ProximityPromptModule.ObjectPrompt()
+                ProximityPrompt.Parent = Object
+
                 if Category == "Turrets" then
                     TurretClass.new(Object, PlayerService.Players[player.UserId])
                 elseif Category == "Barricades" then
                     BarricadeClass.new(Object, PlayerService.Players[player.UserId])
+                elseif Category == "Doors" then
+                    local isDoorClass = string.find(Object.Name, "Door")
+                    ProximityPrompt.Name = "DoorPrompt"
+                    if isDoorClass then
+                        DoorClass.new(Object, PlayerService.Players[player.UserId])
+                    else
+                        HatchClass.new(Object, PlayerService.Players[player.UserId])
+                    end
                 end
                 BaseSavingService:AddItem(player, Object, Category, PlayerService.Players[player.UserId].Base)
             end

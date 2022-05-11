@@ -25,6 +25,12 @@ function PlacementController:PromptCancelFrame(ObjectTitle)
     self.ObjectFrame.Visible = false
     self.CancelTitle.Text = ObjectTitle
     self.CancelFrame.Visible = true
+    if ObjectTitle == "Delete Mode" then
+        self.RotateButton.Visible = false
+    else
+        self.RotateButton.Visible = true
+    end
+
     self.BuildJanitor:Add(self.CancelButton.Activated:Connect(function()
         PlacementController:SetDefault()
         self.WeaponController:Equip()
@@ -77,7 +83,7 @@ function PlacementController:BuildMode(ObjectName : string)
                 if Mouse.Target ~= nil and self.Base then
                     local Hitpos = Mouse.Hit.Position
                    
-                    local ObjectExtents : Vector3 = self.SelectedObject:GetExtentsSize()
+                    local ObjectExtents : Vector3 = self.SelectedObject.PrimaryPart.Size
                     local BaseCFrame, BaseSize  = self.Base.Baseplate.CFrame, self.Base.Baseplate.Size
                    
                     --// Base Grid Size
@@ -105,7 +111,7 @@ function PlacementController:BuildMode(ObjectName : string)
                     local TargetPositionRelativeToBase
                     if Target 
                         and Target ~= self.Base.Baseplate then
-                        local TargetSize = Target:GetExtentsSize()
+                        local TargetSize = Target.PrimaryPart.Size
                         TargetPositionRelativeToBase = (Target.WorldPivot.Position - BaseCFrame.Position)
 
                        
@@ -157,17 +163,28 @@ function PlacementController:BuildMode(ObjectName : string)
                         roundToTheNearest(ClampedPosition.Z, 3)
                     )
 
-                   -- if Target == self.Base.Baseplate then
-                      --  GridPosition +=  Vector3.new(0,BaseSize.Y/2,0)
-                   -- end
+                    --// detect if we are colliding with another object
+                    local OverLapPara = OverlapParams.new()
+                    OverLapPara.FilterType = Enum.RaycastFilterType.Whitelist
+                    OverLapPara.FilterDescendantsInstances = {self.Base.Objects}
 
+                    local HitParts = workspace:GetPartBoundsInBox(
+                        CFrame.new(GridPosition) * self.SelectedObject.WorldPivot.Rotation,
+                        Vector3.new(ObjectExtents.X/2, ObjectExtents.Y/2, ObjectExtents.Z/2),
+                        OverLapPara
+                    )
 
-                    --HitBall.CFrame = BaseCFrame + ClampedPosition
-
+                    for _, Part in ipairs(HitParts) do
+                        local Model = Part:FindFirstAncestorOfClass("Model")
+                        if Model
+                            and Model ~= self.SelectedObject then
+                             return
+                        end
+                    end
 
                     --// Apply relative gridposition to baseplate position
                     self.SelectedObject:PivotTo(
-                        CFrame.new(GridPosition)
+                        CFrame.new(GridPosition) * self.SelectedObject.WorldPivot.Rotation
                     )
                 end
             end)
@@ -230,6 +247,8 @@ end]]
 
 function PlacementController:LoadCategory(Category : string, isBuild)
     if self.State == "Categories" then
+        self.ItemList.CanvasPosition = Vector2.new(0,0)
+
         --// clear old category
         for _, Child in ipairs(self.ItemList:GetChildren()) do
             if not Child:IsA("UIGridLayout") then
@@ -325,6 +344,7 @@ function  PlacementController:LoadCategories(Categories, isBuild)
     self:SetDefault()
 
     if self.ObjectFrame.Visible == false then
+        self.ItemList.CanvasPosition = Vector2.new(0,0)
         self.State = "Categories"
         --// clear old category
         for _, Child in ipairs(self.ItemList:GetChildren()) do
@@ -408,6 +428,13 @@ function PlacementController:DeleteMode()
     end))
 end
 
+function PlacementController:Rotate()
+    if self.SelectedObject then
+        print("Rotated")
+        self.SelectedObject:PivotTo(self.SelectedObject.WorldPivot * CFrame.Angles(0,math.rad(90),0))
+    end
+end
+
 function PlacementController:SetDefault()
     self.State = "Default"
     self.CancelFrame.Visible = false
@@ -475,6 +502,8 @@ function PlacementController:KnitStart()
     self.CancelFrame = self.PlacementUI.CancelFrame
     self.CancelButton = self.CancelFrame.CancelButton
     self.CancelTitle = self.CancelFrame.CancelTitle
+    
+    self.RotateButton = self.CancelFrame.RotateButton
 
     --//Janitors
     self._janitor = janitor.new()
@@ -506,6 +535,11 @@ function PlacementController:KnitStart()
         self:SetDefault()
         self.WeaponController:Equip()
         
+    end)
+
+    --// rotate object
+    self.RotateButton.Activated:Connect(function()
+        self:Rotate()
     end)
 
     --// Update PlayerData on signal

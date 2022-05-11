@@ -44,7 +44,7 @@ function WeaponController:KnitStart()
     if self.Player.Character then
         repeat
             task.wait()
-        until not self.Player.Character or self.Player:HasAppearanceLoaded()
+        until not self.Player.Character or (self.Player:HasAppearanceLoaded() and self.Player.Character:IsDescendantOf(workspace))
 
         self.Backpack = self.Player:WaitForChild("Backpack")
 
@@ -69,7 +69,7 @@ function WeaponController:KnitStart()
     self.Player.CharacterAdded:Connect(function(Character)
         repeat
             task.wait()
-        until not Character or self.Player:HasAppearanceLoaded()
+        until not Character or  (self.Player:HasAppearanceLoaded() and self.Player.Character:IsDescendantOf(workspace))
         
         if self.CurrentWeapon then
             self.CurrentWeapon:CleanUp()

@@ -1,6 +1,6 @@
 local PlacmentObjectData = {}
 
-PlacmentObjectData.CategoryList = {"Blocks", "Turrets", "Barricades"}
+PlacmentObjectData.CategoryList = {"Blocks", "Turrets", "Barricades", "Doors"}
 
 PlacmentObjectData.Blocks = {
     ["Leaves"] = {
@@ -106,6 +106,36 @@ PlacmentObjectData.Barricades = {
         Cost = 75,
     },
 }
+
+PlacmentObjectData.Doors = {
+    ["Wooden Door"] = {
+        CategorySort = {
+            ["Doors"] = 0001,
+        },
+        Health = 125,
+        Cost = 25,
+    },
+    ["Wooden Hatch"] = {
+        CategorySort = {
+            ["Doors"] = 00011,
+        },
+
+        Health = 125,
+        Cost = 25,
+    },
+}
+
+function PlacmentObjectData.GetObject(objectName)
+    if tostring(objectName) then
+        for _, Category in ipairs(PlacmentObjectData.CategoryList) do
+            for ObjectName, ObjectData in pairs(PlacmentObjectData[Category]) do
+                if objectName == ObjectName then
+                    return ObjectData
+                end
+            end
+        end
+    end
+end
 
 
 return PlacmentObjectData
