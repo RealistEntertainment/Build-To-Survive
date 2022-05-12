@@ -32,7 +32,9 @@ function PlacementService:PlaceObject(player : Player, ObjectName, ObjectCFrame,
     if tostring(ObjectName) and type(ObjectCFrame) == "userdata" then
         local Object = Assets.PlacementObjects:FindFirstChild(ObjectName)
         local ObjectData = PlacementObjectData[Category][ObjectName]
-        if Object and ObjectData then
+        --// this checks if the category is owned and requires a purchase
+        local OwnsCategory = if PlacementObjectData.CategoryPurchaseRequire[Category] then GamepassService:UserOwnsPass(player, Category) else true
+        if Object and ObjectData and OwnsCategory then
             --// make sure the object isn't intersecting others
             local OverLapPara = OverlapParams.new()
             OverLapPara.FilterType = Enum.RaycastFilterType.Whitelist
@@ -64,18 +66,16 @@ function PlacementService:PlaceObject(player : Player, ObjectName, ObjectCFrame,
                 local ProximityPrompt = ProximityPromptModule.ObjectPrompt()
                 ProximityPrompt.Parent = Object
 
-                if Category == "Turrets" then
+                if string.find(Object.Name, "Turret")then
                     TurretClass.new(Object, PlayerService.Players[player.UserId])
-                elseif Category == "Barricades" then
+                elseif string.find(Object.Name, "Barricade") then
                     BarricadeClass.new(Object, PlayerService.Players[player.UserId])
-                elseif Category == "Doors" then
-                    local isDoorClass = string.find(Object.Name, "Door")
+                elseif string.find(Object.Name, "Door") then
                     ProximityPrompt.Name = "DoorPrompt"
-                    if isDoorClass then
-                        DoorClass.new(Object, PlayerService.Players[player.UserId])
-                    else
-                        HatchClass.new(Object, PlayerService.Players[player.UserId])
-                    end
+                    DoorClass.new(Object, PlayerService.Players[player.UserId])
+                elseif string.find(Object.Name, "Hatch") then
+                    ProximityPrompt.Name = "DoorPrompt"
+                    HatchClass.new(Object, PlayerService.Players[player.UserId])
                 end
                 BaseSavingService:AddItem(player, Object, Category, PlayerService.Players[player.UserId].Base)
             end
@@ -92,6 +92,7 @@ function PlacementService:KnitStart()
     PlayerService = Knit.GetService("PlayerService")
     BaseSavingService = Knit.GetService("BaseSavingService")
     PlayerDataService = Knit.GetService("PlayerDataService")
+    GamepassService = Knit.GetService("GamepassService")
 end
 
 function PlacementService:KnitInit()

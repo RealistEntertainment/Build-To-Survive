@@ -1,6 +1,13 @@
 local PlacmentObjectData = {}
 
 PlacmentObjectData.CategoryList = {"Blocks", "Turrets", "Barricades", "Doors"}
+PlacmentObjectData.CategoryPurchaseRequire = {
+    ["Blocks"] = false, 
+    ["Turrets"] = false, 
+    ["Barricades"] = false, 
+    ["Doors"] = false,
+    ["Modern"] = true,
+}
 
 PlacmentObjectData.Blocks = {
     ["Leaves"] = {
@@ -124,6 +131,35 @@ PlacmentObjectData.Doors = {
         Cost = 25,
     },
 }
+
+PlacmentObjectData.Doors = {
+    ["Wooden Door"] = {
+        CategorySort = {
+            ["Doors"] = 0001,
+        },
+        Health = 125,
+        Cost = 25,
+    },
+    ["Wooden Hatch"] = {
+        CategorySort = {
+            ["Doors"] = 00011,
+        },
+
+        Health = 125,
+        Cost = 25,
+    },
+}
+
+PlacmentObjectData.Modern = {
+    ["Wooden Door"] = {
+        CategorySort = {
+            ["Modern"] = 0001,
+        },
+        Health = 125,
+        Cost = 25,
+    },
+}
+
 
 function PlacmentObjectData.GetObject(objectName)
     if tostring(objectName) then

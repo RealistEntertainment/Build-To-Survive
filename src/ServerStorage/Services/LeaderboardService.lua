@@ -93,9 +93,6 @@ function LeaderboardService:KnitStart()
 		--// Update player times
 		for player, Data in pairs(self.PlayerTimes) do
 			task.wait(15)
-			pcall(function()
-				
-			end)
 			if self.PlayerTimes[player]  then
 				self:UpdatePlayerTime(Data[2], Data[1])
 				Data[2] = os.time() -- reset last time 

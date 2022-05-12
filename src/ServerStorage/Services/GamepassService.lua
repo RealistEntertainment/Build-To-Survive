@@ -9,16 +9,14 @@ local GamepassService = Knit.CreateService{
 	Client = {}
 }
 
---// not used just to hold ids for now
-local Gamepasses = {
-    44187143, --// Double Speed
-    44188735 --// Double Money
-}
+--// Gamepasses Data
+local Gamepasses = require(ReplicatedStorage.Source.Modules.ProductData).Gamepasses
 
 function GamepassService:UserOwnsPass(player, gamePassId)
     local PlayerData = self.PlayerDataService:GetData(player)
     if PlayerData then --// 
-        if table.find(PlayerData.GamepassData, gamePassId) then
+        local Haspass = table.find(PlayerData.GamepassData, gamePassId) or table.find(PlayerData.GamepassData, Gamepasses[gamePassId]) 
+        if Haspass then
             return true
         else
             local Success, OwnsPass = pcall(MarketplaceService.UserOwnsGamePassAsync, player.UserId, gamePassId)

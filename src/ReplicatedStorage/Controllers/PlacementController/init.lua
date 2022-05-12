@@ -267,6 +267,7 @@ function PlacementController:LoadCategory(Category : string, isBuild)
         self.Category_Janitor:Cleanup()
         self.BuildJanitor:Cleanup()
 
+
         --// create category Buttons
         local Objects = self.PlacementObjectData[Category] or self.WeaponData[Category]
         for objectName, ObjectData in pairs(Objects) do
@@ -366,6 +367,8 @@ function  PlacementController:LoadCategories(Categories, isBuild)
         for _, Category in ipairs(Categories) do
             local Button = Util.CreateCategoryButton(Category)
             Button.Parent = self.ItemList
+
+            --// check if user has the gamepass in data if not then check if user owns it. if any are true then don't add purchase text
             self.Category_Janitor:Add(
                 Button.Activated:Connect(function()
                     self:LoadCategory(Category, isBuild)

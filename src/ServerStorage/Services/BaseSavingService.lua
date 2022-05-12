@@ -159,19 +159,16 @@ function BaseSavingService:LoadPlayerBase(player : Player)
             local ProximityPrompt = ProximityPromptModule.ObjectPrompt()
             ProximityPrompt.Parent = Item
 
-            if ItemData.Category == "Turrets" then
+            if string.find(ItemData.Name, "Turret")then
                 TurretClass.new(Item, PlayerService.Players[player.UserId])
-            elseif ItemData.Category == "Barricades" then
+            elseif string.find(ItemData.Name, "Barricade") then
                 BarricadeClass.new(Item, PlayerService.Players[player.UserId])
-            elseif ItemData.Category == "Doors" then
-                local isDoorClass = string.find(ItemData.Name, "Door")
+            elseif string.find(ItemData.Name, "Door") then
                 ProximityPrompt.Name = "DoorPrompt"
-                ProximityPrompt.ClickablePrompt = true
-                if isDoorClass then
-                    DoorClass.new(Item, PlayerService.Players[player.UserId])
-                else
-                    HatchClass.new(Item, PlayerService.Players[player.UserId])
-                end
+                DoorClass.new(Item, PlayerService.Players[player.UserId])
+            elseif string.find(ItemData.Name, "Hatch") then
+                ProximityPrompt.Name = "DoorPrompt"
+                HatchClass.new(Item, PlayerService.Players[player.UserId])
             end
         end
     end
@@ -221,7 +218,6 @@ function BaseSavingService:KnitStart()
 
     Players.PlayerRemoving:Connect(function(player)
         local Profile = self.CachedProfiles[player]
-        print(Profile.Data.Base)
         if Profile then
             Profile:Release()
         end

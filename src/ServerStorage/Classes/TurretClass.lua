@@ -50,7 +50,7 @@ function TurretClass:PlayAttack(TargetPosition)
         local X, Y, Z = GoalRotation:ToEulerAnglesXYZ()
        
         GunBarrel:PivotTo(
-            Base.CFrame --// position barrel to Base
+            CFrame.new(Base.Position)--// position barrel to Base
             * CFrame.fromEulerAnglesXYZ(0, Y, 0) --// rotate the barrel to the target
             * RelatativeCenterCFrame --// apply offset from base to barrel
         )
