@@ -8,8 +8,23 @@ local config = require(script.Parent.config)
 local util = {}
 
 util.Products = { 
-    [1263372863] = function(profile, player)
-        PlayerDataService:AddMoney(player, 10000)
+    [1263372863] = function(profile, player) --// 49 obux cash option 1
+        PlayerDataService:AddMoney(player, 3500)
+    end,
+	[1263733810] = function(profile, player) --// 99 obux cash option 2
+        PlayerDataService:AddMoney(player, 7250)
+    end,
+	[1263733847] = function(profile, player) --// 199 obux cash option 3
+        PlayerDataService:AddMoney(player, 15000)
+    end,
+	[1263733947] = function(profile, player) --// 399 obux cash option 4
+        PlayerDataService:AddMoney(player, 32000)
+    end,
+	[1263733972] = function(profile, player) --// 599 obux cash option 5
+        PlayerDataService:AddMoney(player, 65000)
+    end,
+	[1263734005] = function(profile, player) --// 1199 obux cash option 6
+        PlayerDataService:AddMoney(player, 140000)
     end,
 }
 

@@ -6,37 +6,24 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local GamepassService = Knit.CreateService{
 	Name = "GamepassService",
-	Client = {}
+	Client = {
+        Purchased = Knit.CreateSignal()
+    }
 }
 
 --// Gamepasses Data
-local Gamepasses = require(ReplicatedStorage.Source.Modules.ProductData).Gamepasses
+local Gamepasses = require(ReplicatedStorage.Source.Modules.ProductData)
 
 function GamepassService:UserOwnsPass(player, gamePassId)
     local PlayerData = self.PlayerDataService:GetData(player)
-    if PlayerData then --// 
-        local Haspass = table.find(PlayerData.GamepassData, gamePassId) or table.find(PlayerData.GamepassData, Gamepasses[gamePassId]) 
-        if Haspass then
-            return true
-        else
-            local Success, OwnsPass = pcall(MarketplaceService.UserOwnsGamePassAsync, player.UserId, gamePassId)
-            if Success then
-                if OwnsPass then
-                    table.insert(PlayerData.GamepassData, gamePassId)
-                    print('Has pass not in data')
-                    return true
-                end
-            end
-        end
-    end
-    print("Doesn't have a pass")
-    return false
+    return Gamepasses.UserOwnsPass(PlayerData, player, gamePassId)
 end
 
 function GamepassService:GamepassPromptFinished(player, gamePassId, wasPurchased)
     local PlayerData = self.PlayerDataService:GetData(player)
     if wasPurchased and PlayerData then
-        table.insert(PlayerData.GamepassData, gamePassId)
+      --  table.insert(PlayerData.GamepassData, gamePassId)
+        self.Client.Purchased:Fire(player,  gamePassId)
     end
 end
 

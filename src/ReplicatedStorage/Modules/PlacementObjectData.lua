@@ -1,7 +1,16 @@
-local PlacmentObjectData = {}
+local PlacementObjectData = {}
 
-PlacmentObjectData.CategoryList = {"Blocks", "Turrets", "Barricades", "Doors"}
-PlacmentObjectData.CategoryPurchaseRequire = {
+--// this is in the order seen below
+PlacementObjectData.CategoryList = {
+    "Blocks", 
+    "Turrets", 
+    "Barricades", 
+    "Doors",
+    "Modern"
+}
+
+
+PlacementObjectData.CategoryPurchaseRequire = {
     ["Blocks"] = false, 
     ["Turrets"] = false, 
     ["Barricades"] = false, 
@@ -9,7 +18,7 @@ PlacmentObjectData.CategoryPurchaseRequire = {
     ["Modern"] = true,
 }
 
-PlacmentObjectData.Blocks = {
+PlacementObjectData.Blocks = {
     ["Leaves"] = {
         CategorySort = {
             ["Blocks"] = 0001,
@@ -84,7 +93,7 @@ PlacmentObjectData.Blocks = {
     },
 }
 
-PlacmentObjectData.Turrets = {
+PlacementObjectData.Turrets = {
     ["Basic Turret"] = {
         CategorySort = {
             ["Turrets"] = 0001,
@@ -96,7 +105,7 @@ PlacmentObjectData.Turrets = {
     },
 }
 
-PlacmentObjectData.Barricades = {
+PlacementObjectData.Barricades = {
     ["Wooden Barricade"] = {
         CategorySort = {
             ["Barricades"] = 0001,
@@ -114,7 +123,7 @@ PlacmentObjectData.Barricades = {
     },
 }
 
-PlacmentObjectData.Doors = {
+PlacementObjectData.Doors = {
     ["Wooden Door"] = {
         CategorySort = {
             ["Doors"] = 0001,
@@ -132,7 +141,7 @@ PlacmentObjectData.Doors = {
     },
 }
 
-PlacmentObjectData.Doors = {
+PlacementObjectData.Doors = {
     ["Wooden Door"] = {
         CategorySort = {
             ["Doors"] = 0001,
@@ -150,7 +159,7 @@ PlacmentObjectData.Doors = {
     },
 }
 
-PlacmentObjectData.Modern = {
+PlacementObjectData.Modern = {
     ["Wooden Door"] = {
         CategorySort = {
             ["Modern"] = 0001,
@@ -161,10 +170,10 @@ PlacmentObjectData.Modern = {
 }
 
 
-function PlacmentObjectData.GetObject(objectName)
+function PlacementObjectData.GetObject(objectName)
     if tostring(objectName) then
-        for _, Category in ipairs(PlacmentObjectData.CategoryList) do
-            for ObjectName, ObjectData in pairs(PlacmentObjectData[Category]) do
+        for _, Category in ipairs(PlacementObjectData.CategoryList) do
+            for ObjectName, ObjectData in pairs(PlacementObjectData[Category]) do
                 if objectName == ObjectName then
                     return ObjectData
                 end
@@ -173,5 +182,10 @@ function PlacmentObjectData.GetObject(objectName)
     end
 end
 
+--// return index of category
+function PlacementObjectData.GetCategory(Category)
+    return table.find(PlacementObjectData.CategoryList, Category)
+end
 
-return PlacmentObjectData
+
+return PlacementObjectData

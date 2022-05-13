@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local UserInputService = game:GetService("UserInputService")
+local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Classes = ReplicatedStorage.Source.Classes
@@ -217,7 +218,7 @@ end
     
     for _, PlacementObject in ipairs(PlacementObjects:GetChildren()) do
         -- Viewport
-        local ObjectViewPort : ViewportFrame = self.Util.CreateViewportFrame()
+        local ObjectViewPort : ViewportFrame = Util.CreateViewportFrame()
         ObjectViewPort.CurrentCamera = self.Camera
         ObjectViewPort.Parent = ItemsScrollingFrame
         print(ObjectViewPort)
@@ -271,7 +272,7 @@ function PlacementController:LoadCategory(Category : string, isBuild)
         --// create category Buttons
         local Objects = self.PlacementObjectData[Category] or self.WeaponData[Category]
         for objectName, ObjectData in pairs(Objects) do
-            local ObjectViewPort : ViewportFrame = self.Util.CreateItemViewportFrame()
+            local ObjectViewPort : ViewportFrame = Util.CreateItemViewportFrame()
             ObjectViewPort.CurrentCamera = self.Camera 
             ObjectViewPort.Name = Objects[objectName].CategorySort[Category]
             ObjectViewPort.Parent = self.ItemList
@@ -364,14 +365,28 @@ function  PlacementController:LoadCategories(Categories, isBuild)
         self.BuildJanitor:Cleanup()
 
         --// create category Buttons
-        for _, Category in ipairs(Categories) do
+        for CategoryIndex, Category in ipairs(Categories) do
             local Button = Util.CreateCategoryButton(Category)
             Button.Parent = self.ItemList
-
+            Button.Name = CategoryIndex
             --// check if user has the gamepass in data if not then check if user owns it. if any are true then don't add purchase text
+            local OwnsCategory = if self.PlacementObjectData.CategoryPurchaseRequire[Category] then Util.UserOwnsCategory(self.PlayerData, self.Player, Category) else true
+           
+            if not OwnsCategory then
+                local OverlayButton : TextButton = Util.CreatePurchaseCategoryOverlay()
+                OverlayButton.Parent = Button
+                self.Category_Janitor:Add(OverlayButton.Activated:Connect(function()
+                        Util.PromptCategoryPurchase(self.Player, Category)
+                    end)
+                )
+            end
+
             self.Category_Janitor:Add(
                 Button.Activated:Connect(function()
-                    self:LoadCategory(Category, isBuild)
+                    OwnsCategory = if self.PlacementObjectData.CategoryPurchaseRequire[Category] then Util.UserOwnsCategory(self.PlayerData, self.Player, Category) else true
+                    if OwnsCategory then
+                        self:LoadCategory(Category, isBuild)
+                    end
                 end)
             )
         end
@@ -452,7 +467,6 @@ function PlacementController:SetDefault()
 end
 
 function PlacementController:KnitStart()
-    print("Knit started in controller")
     local Assets = ReplicatedStorage.Assets
     local UI = Assets.UI
     PlacementObjects = Assets.PlacementObjects
@@ -461,8 +475,10 @@ function PlacementController:KnitStart()
     PlayerService = Knit.GetService("PlayerService")
     PlayerDataService =  Knit.GetService("PlayerDataService")
     WeaponService = Knit.GetService("WeaponService")
+    GamepassService = Knit.GetService("GamepassService")
 
-    self.Util =  require(script.util)
+
+    Util =  require(script.util)
 
     self.PlacementObjects = Assets.PlacementObjects
     self.PlacementObjectData = require(ReplicatedStorage.Source.Modules.PlacementObjectData)
@@ -475,6 +491,7 @@ function PlacementController:KnitStart()
     PlayerDataService.GetData():andThen(function(Data)
         self.PlayerData = Data
     end):await()
+
 
     self.PlacementUI  = UI.Placement:Clone()
     self.PlacementUI.Parent = self.Player.PlayerGui
@@ -556,6 +573,17 @@ function PlacementController:KnitStart()
         if tonumber(CashAmount) then
            MainButtons.Cash.Text = "$" .. tostring(CashAmount) 
         end
+    end)
+
+    --// update gamepass purchase
+    GamepassService.Purchased:Connect(function(PurchasedID)
+        print(PurchasedID)
+        --// add gamepass to the players data
+        table.insert(self.PlayerData.GamepassData, PurchasedID)
+        --// get the name of gamepass (in this case we need it to know the category purchased)
+        local GamepassName = Util.GetGamepassName(PurchasedID)
+        --// after purchase tell the category to remove the Overlay
+        Util.CategoryPurchased(self.ItemList, GamepassName)
     end)
 
     --// make the main UI visable after connections 

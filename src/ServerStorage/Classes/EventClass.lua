@@ -38,8 +38,8 @@ function EventClass:Intermission()
     self.RoundService.Client.Feedback:FireAll(true, "Picking Random Round!")
     task.wait(3)
     self.RoundService.Client.Feedback:FireAll(true, self.EventData.Announcement)
-    for i = 1, 15 do
-       -- task.wait(1)
+    for i = 1, 30 do
+        task.wait(1)
         self.RoundService.Client.Feedback:FireAll(true, "Round starting in..." .. 15 - i)
     end
 end
