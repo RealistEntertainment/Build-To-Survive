@@ -38,9 +38,10 @@ function EventClass:Intermission()
     self.RoundService.Client.Feedback:FireAll(true, "Picking Random Round!")
     task.wait(3)
     self.RoundService.Client.Feedback:FireAll(true, self.EventData.Announcement)
+    task.wait(5)
     for i = 1, 30 do
         task.wait(1)
-        self.RoundService.Client.Feedback:FireAll(true, "Round starting in..." .. 15 - i)
+        self.RoundService.Client.Feedback:FireAll(true, "Round starting in..." .. 30 - i)
     end
 end
 
@@ -50,11 +51,11 @@ function EventClass:StartEvent()
     self:Intermission()
 
     --// handle spawning event stuff for each player
+    self.Npc = {}
     for _, PlayerClass in pairs(self.PlayerService.Players) do
         local Base = PlayerClass.Base
         if Base then
             if self.EventData.EventType == "MobSpawning" then
-                self.Npc = {}
                 local Npc = ServerAssets.Mobs:FindFirstChild(self.EventData.NpcModel)
                 for i = 1, self.EventData.NpcCount do
                     local newNpc = Npc:Clone()

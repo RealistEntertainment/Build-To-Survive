@@ -99,6 +99,10 @@ function PlayerDataService:AddMoney(player: Player, amount : number)
     end
 end
 
+function PlayerDataService:Wipe(player)
+    ProfileStore:WipeProfileAsync("Player_" .. player.UserId) 
+end
+
 function PlayerDataService:PlayerLoaded(player, Profile)
     if Profile then
         self.Client.CashUpdate:Fire(player, Profile.Data.Cash)

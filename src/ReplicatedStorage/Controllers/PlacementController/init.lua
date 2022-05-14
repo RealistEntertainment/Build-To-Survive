@@ -3,6 +3,9 @@ local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local UserInputService = game:GetService("UserInputService")
 local MarketplaceService = game:GetService("MarketplaceService")
+local ChangeHistoryService = game:GetService("ChangeHistoryService")
+local Debris = game:GetService("Debris")
+local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Classes = ReplicatedStorage.Source.Classes
@@ -42,7 +45,8 @@ function PlacementController:BuildMode(ObjectName : string)
     local Object = self.PlacementObjects:FindFirstChild(tostring(ObjectName))
     local SelectedObjectName = if ObjectName and  self.SelectedObject then self.SelectedObject.Name else nil
     if Object and (SelectedObjectName ~= ObjectName or SelectedObjectName == nil) then
-        PlacementController:PromptCancelFrame(Object.Name)
+        self:PromptCancelFrame(Object.Name)
+        Util.LoadItemData("Object", ObjectName, self.PlacementUI)
         --// Set state
         self.State = "BuildMode"
 
@@ -54,6 +58,12 @@ function PlacementController:BuildMode(ObjectName : string)
         end
 
         self.SelectedObject = Object:Clone()
+        for _,Child : BasePart in ipairs(self.SelectedObject:GetDescendants()) do
+            if Child:IsA("BasePart") then
+                Child.CanCollide = false
+                Child.Transparency = .5
+            end
+        end
         self.SelectedObject.Parent = workspace
 
         print(self.SelectionBox)
@@ -62,6 +72,7 @@ function PlacementController:BuildMode(ObjectName : string)
         end
         self.SelectionBox.Color3 = Color3.fromRGB(0,255,0)
         self.SelectionBox.Adornee = self.SelectedObject
+
          --// check for players base
          if self.Base  == nil then 
             PlayerService.GetPlayerBase():andThen(function(base)
@@ -69,14 +80,20 @@ function PlacementController:BuildMode(ObjectName : string)
             end):await()
         end
 
-        local HitBall = Instance.new("Part")
-        HitBall.Anchored = true
-        HitBall.Size = Vector3.new(.5,.5,.5)
-        HitBall.Color = Color3.fromRGB(0,255,0)
-        --HitBall.Parent = self.SelectedObject
-
+        --// Add Object to janitor to clean up later
         self.SelectedObjectJanitor:Add(self.SelectedObject)
         
+        --// Connect InputService for detecting pressing R for rotate (added to janitor for clean up after build mode is exited)
+        self.SelectedObjectJanitor:Add(
+            UserInputService.InputBegan:Connect(function(Input)
+                if Input.UserInputType == Enum.UserInputType.Keyboard
+                    and Input.KeyCode == Enum.KeyCode.R then
+                        self:Rotate()
+                end
+            end)
+        )
+
+        --// Update object each renderstepped handle all the grid and hit detection calculations
         self.SelectedObjectJanitor:Add(
             RunService.RenderStepped:Connect(function()
                 Mouse.TargetFilter = self.SelectedObject
@@ -315,17 +332,10 @@ function PlacementController:LoadCategory(Category : string, isBuild)
                     self.SelectedObjectJanitor:Cleanup()
                     self.SelectedObject = nil
                     if isBuild then
-                      self:BuildMode(ObjectName)  
+                        self:BuildMode(ObjectName)  
                     else--// weapon stuff
-                        WeaponService.HandleWeapon(self.Player, tostring(objectName), Category):andThen(function(newWeaponData)
-                            if newWeaponData.CurrentWeapon then
-                                self.PlayerData.CurrentWeapon = newWeaponData.CurrentWeapon
-                            end
-                            if newWeaponData.Weapons then
-                                self.PlayerData.Weapons = Weapons
-                            end
-                        end):await()
-                        self:LoadCategory(Category, isBuild)
+                        self.ProductBuyButton.Text =  ObjectViewPort.ObjectPrice.Text
+                        Util.LoadItemData("Weapon", ObjectName, self.PlacementUI)
                     end
                 end
                 
@@ -448,13 +458,14 @@ end
 
 function PlacementController:Rotate()
     if self.SelectedObject then
-        print("Rotated")
+        self.RotateButtonTween:Play()
         self.SelectedObject:PivotTo(self.SelectedObject.WorldPivot * CFrame.Angles(0,math.rad(90),0))
     end
 end
 
 function PlacementController:SetDefault()
     self.State = "Default"
+    self.RotateButton.Visible = false
     self.CancelFrame.Visible = false
     self.ObjectFrame.Visible = false
     self.SelectedObjectJanitor:Cleanup()
@@ -479,6 +490,7 @@ function PlacementController:KnitStart()
 
 
     Util =  require(script.util)
+    Config = require(script.config)
 
     self.PlacementObjects = Assets.PlacementObjects
     self.PlacementObjectData = require(ReplicatedStorage.Source.Modules.PlacementObjectData)
@@ -523,13 +535,21 @@ function PlacementController:KnitStart()
     self.CancelButton = self.CancelFrame.CancelButton
     self.CancelTitle = self.CancelFrame.CancelTitle
     
-    self.RotateButton = self.CancelFrame.RotateButton
+    --// PurchaseProductFrame
+    self.ProductPurchaseFrame = self.PlacementUI.ProductPurchaseFrame
+    self.ProductBuyButton = self.ProductPurchaseFrame.BuyButton
+    self.ProductCloseButton = self.ProductPurchaseFrame.CloseButton
+
+    self.RotateButton = self.PlacementUI.RotateButton
 
     --//Janitors
     self._janitor = janitor.new()
     self.Category_Janitor = janitor.new()
     self.BuildJanitor = janitor.new()
     self.SelectedObjectJanitor = janitor.new()
+
+    --// Tweens
+    self.RotateButtonTween = TweenService:Create(self.RotateButton, Config.RotateTweenInfo, {Rotation = 45})
 
     --// Set GUI State
     self.State = "Default"
@@ -557,6 +577,27 @@ function PlacementController:KnitStart()
         
     end)
 
+    --// ProductBuyButton
+    self.ProductBuyButton.Activated:Connect(function()
+        local Weapon, Category = self.WeaponData.GetWeapon(self.ProductPurchaseFrame.Title.Text)
+        if Weapon then
+            WeaponService.HandleWeapon(self.Player, tostring(self.ProductPurchaseFrame.Title.Text), Category):andThen(function(newWeaponData)
+                if newWeaponData.CurrentWeapon then
+                    self.PlayerData.CurrentWeapon = newWeaponData.CurrentWeapon
+                end
+                if newWeaponData.Weapons then
+                    self.PlayerData.Weapons = Weapons
+                end
+            end):await()
+            self:LoadCategory(Category, false)
+            self.ProductPurchaseFrame.Visible = false
+        end
+    end)
+
+    self.ProductCloseButton.Activated:Connect(function()
+        self.ProductPurchaseFrame.Visible = false
+    end)
+
     --// rotate object
     self.RotateButton.Activated:Connect(function()
         self:Rotate()
@@ -570,8 +611,15 @@ function PlacementController:KnitStart()
     --//Update and connect cash
     MainButtons.Cash.Text = if self.PlayerData.Cash then "$" .. tostring(self.PlayerData.Cash) else "Error Loading Cash"
     PlayerDataService.CashUpdate:Connect(function(CashAmount : number)
-        if tonumber(CashAmount) then
-           MainButtons.Cash.Text = "$" .. tostring(CashAmount) 
+        --// if new cash > Last Cash then "Adding" else "Removing" 
+        local CashChangeState = if ((CashAmount - self.PlayerData.Cash) > 0) then "Adding" else "Removing"
+        --// Time = changeAmount/10 clamped to .3, 5
+       -- local CashTweenTime = math.clamp(math.abs(CashAmount - self.PlayerData.Cash)/10,.3, 5)
+       -- local
+        if CashChangeState  == "Adding" then
+            MainButtons.Cash.Text = "$" .. tostring(CashAmount)
+        else
+            MainButtons.Cash.Text = "$" .. tostring(CashAmount)
         end
     end)
 

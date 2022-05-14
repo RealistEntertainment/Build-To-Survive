@@ -21,7 +21,6 @@ function HatchClass.new(Hatch, PlayerClass)
 
 	self.janitor:Add(
         self.ProximityPrompt.Triggered:Connect(function(...)
-            print(...)
 		    self:HandleHatch(...)
 	    end)
     )
@@ -39,7 +38,7 @@ end
 
 
 function HatchClass:HandleHatch(Player)
-	if not self.debounce then
+	if not self.debounce and self.PlayerClass.Player == Player then
 		self.debounce = true
         if self.IsOpen then
             self:Close(Player, 5)

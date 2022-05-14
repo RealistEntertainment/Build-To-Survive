@@ -5,6 +5,7 @@ local config = require(script.Parent.config)
 
 local ProductData = require(ReplicatedStorage.Source.Modules.ProductData)
 local PlacementObjectData = require(ReplicatedStorage.Source.Modules.PlacementObjectData)
+local WeaponData = require(ReplicatedStorage.Source.Modules.WeaponData)
 
 local util = {}
 
@@ -98,6 +99,66 @@ end
 
 function util.UserOwnsCategory(PlayerData, player, Category)
     return ProductData.UserOwnsPass(PlayerData, player, Category)
+end
+
+function util.LoadItemData(ItemType, ItemName, PlacementUI)
+    if ItemType == "Object" then
+        local CancelFrame : Frame = PlacementUI.CancelFrame
+        local InfoFrame : ScrollingFrame = CancelFrame.InfoFrame
+        local ObjectInfoLayout = {"Health", "Damage", "FireRate"}
+        local ObjectData = PlacementObjectData.GetObject(ItemName)
+
+        --// clear InfoFrame
+        for _, Child in ipairs(InfoFrame:GetChildren()) do
+            if Child:IsA("TextLabel") then
+                Child:Destroy()
+            end
+        end
+        --// Create data for this here
+        for _,Stat in ipairs(ObjectInfoLayout) do
+            if ObjectData[Stat] ~= nil then
+               local StatText : TextLabel = Instance.new("TextLabel")
+               StatText.BackgroundTransparency = 1
+               StatText.TextColor3 = Color3.fromRGB(255,255,255)
+               StatText.TextStrokeTransparency = 0
+               StatText.Text = Stat .. ": " .. tostring(ObjectData[Stat])
+               StatText.TextScaled = true
+               StatText.Parent = InfoFrame
+            end
+        end
+
+    elseif ItemType == "Weapon" then 
+        local ProductPurchaseFrame : Frame = PlacementUI.ProductPurchaseFrame
+        local ProductTitle : TextLabel = ProductPurchaseFrame.Title
+        local InfoFrame : ScrollingFrame = ProductPurchaseFrame.InfoFrame
+        local WeaponInfoLayout = {"Damage", "AttackRange", "AttackDelay"}
+       
+        local TheWeaponData, Category = WeaponData.GetWeapon(ItemName)
+        
+        --// Set Product Title
+        ProductTitle.Text = tostring(ItemName)
+
+        --// clear InfoFrame
+        for _, Child in ipairs(InfoFrame:GetChildren()) do
+            if Child:IsA("TextLabel") then
+                Child:Destroy()
+            end
+        end
+        --// Create data for this here
+        for _,Stat in ipairs(WeaponInfoLayout) do
+            if TheWeaponData[Stat] ~= nil then
+               local StatText : TextLabel = Instance.new("TextLabel")
+               StatText.BackgroundTransparency = 1
+               StatText.TextColor3 = Color3.fromRGB(255,255,255)
+               StatText.TextStrokeTransparency = 0
+               StatText.Text = Stat .. ": " .. tostring(TheWeaponData[Stat])
+               StatText.TextScaled = true
+               StatText.Parent = InfoFrame
+            end
+        end
+
+        ProductPurchaseFrame.Visible = true
+    end  
 end
 
 return util

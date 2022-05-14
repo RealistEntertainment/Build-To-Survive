@@ -13,7 +13,6 @@ local WeaponService = Knit.CreateService{
 }
 
 function WeaponService.Client:HandleWeapon(player : Player, Weapon, weaponCategory)
-    print(player, Weapon, weaponCategory)
     local CachedPlayer = self.Server.PlayerDataService.CachedProfiles[player]
     print(CachedPlayer)
     if CachedPlayer

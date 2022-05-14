@@ -174,7 +174,9 @@ function BaseSavingService:LoadPlayerBase(player : Player)
     end
 
     --// Important.. The character must load this first time to start the playerclass(respawning)
-    player:LoadCharacter()
+    if player then
+        player:LoadCharacter()
+    end
 end
 
 

@@ -45,8 +45,8 @@ local config = {
                 Transparency = 0,
             }
         }
-    }
-    
+    },
+    RotateTweenInfo = TweenInfo.new(.3, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, true, 0),
 }
 
 return config
