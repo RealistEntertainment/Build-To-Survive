@@ -10,6 +10,7 @@ type AncestorList = {Instance}
 	@within Component
 ]=]
 type ExtensionFn = (any) -> ()
+
 --[=[
 	@type ExtensionShouldFn (component) -> boolean
 	@within Component
@@ -203,7 +204,7 @@ local function InvokeExtensionFn(component, fnName: string)
 		if type(fn) == "function" then
 			fn(component)
 		end
-	end 
+	end
 end
 
 

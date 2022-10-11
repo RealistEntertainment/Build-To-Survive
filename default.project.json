@@ -1,44 +1,36 @@
 {
-    "name": "Speed-Run-Evolved",
+    "name": "Survival-Reborn",
     "tree": {
         "$className": "DataModel",
-
-        "ReplicatedStorage" : {
+        "ReplicatedStorage": {
             "$className": "ReplicatedStorage",
-            "Source" : {
+            "Source": {
                 "$path": "src/ReplicatedStorage"
             },
-            "Packages" : {
+            "Packages": {
                 "$path": "Packages"
             }
         },
-
-        "ServerStorage" : {
+        "ServerStorage": {
             "$className": "ServerStorage",
-            "Source" : {
+            "Source": {
                 "$path": "src/ServerStorage"
             }
-            
         },
-
-        "ServerScriptService" : {
+        "ServerScriptService": {
             "$className": "ServerScriptService",
-            "Source" : {
+            "Source": {
                 "$path": "src/ServerScriptService"
             }
-            
         },
-
-        "StarterPlayer" : {
+        "StarterPlayer": {
             "$className": "StarterPlayer",
-            "StarterPlayerScripts" : {
+            "StarterPlayerScripts": {
                 "$className": "StarterPlayerScripts",
-                "Source" : {
+                "Source": {
                     "$path": "src/StarterPlayerScripts"
                 }
-                
             }
         }
-
     }
 }

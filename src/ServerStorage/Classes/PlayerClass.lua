@@ -15,6 +15,8 @@ function PlayerClass.new(player: Player)
 
     self.Character = player.Character or nil
     
+    self.COOP = {}
+
     self._janitor = Janitor.new()
     self.CharacterAdded = Signal.new()
     self.CharacterDied = Signal.new()

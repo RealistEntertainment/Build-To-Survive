@@ -23,7 +23,7 @@ local DataStoreSettings = config.DataStoreSettings
 
 local ProfileStore = ProfileService.GetProfileStore("PlayerDataV1", DataStoreSettings.ProfileStoreTemplate)
 if RunService:IsStudio() == true then
-  --  ProfileStore = ProfileStore.Mock
+    ProfileStore = ProfileStore.Mock
 end
 
 function PlayerDataService.Client:GetData(player: Player)
